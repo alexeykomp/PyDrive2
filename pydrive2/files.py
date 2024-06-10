@@ -300,6 +300,7 @@ class GoogleDriveFile(ApiAttributeMixin, ApiResource):
         callback=None,
         chunksize=DEFAULT_CHUNK_SIZE,
         acknowledge_abuse=False,
+        abort_trigger = None
     ):
         """Save content of this file as a local file.
 
@@ -330,6 +331,8 @@ class GoogleDriveFile(ApiAttributeMixin, ApiResource):
             done = False
             while done is False:
                 status, done = downloader.next_chunk()
+                if abort_trigger:
+                    break
                 if callback:
                     callback(status.resumable_progress, status.total_size)
 
@@ -361,7 +364,8 @@ class GoogleDriveFile(ApiAttributeMixin, ApiResource):
                     )
                 except errors.HttpError as error:
                     raise ApiRequestError(error)
-
+            if abort_trigger:
+                os.remove(filename)
             if mimetype == "text/plain" and remove_bom:
                 fd.seek(0)
                 bom = self._GetBOM(mimetype)
