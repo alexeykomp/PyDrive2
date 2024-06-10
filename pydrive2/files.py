@@ -329,7 +329,7 @@ class GoogleDriveFile(ApiAttributeMixin, ApiResource):
                 fd, self._WrapRequest(request), chunksize=chunksize
             )
             done = False
-            while done is False:
+            while done is False and not abort_trigger.val:
                 status, done = downloader.next_chunk()
                 if abort_trigger.val:
                     break
