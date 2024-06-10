@@ -331,7 +331,7 @@ class GoogleDriveFile(ApiAttributeMixin, ApiResource):
             done = False
             while done is False:
                 status, done = downloader.next_chunk()
-                if abort_trigger:
+                if abort_trigger.val:
                     break
                 if callback:
                     callback(status.resumable_progress, status.total_size)
@@ -364,7 +364,7 @@ class GoogleDriveFile(ApiAttributeMixin, ApiResource):
                     )
                 except errors.HttpError as error:
                     raise ApiRequestError(error)
-            if abort_trigger:
+            if abort_trigger.val:
                 os.remove(filename)
             if mimetype == "text/plain" and remove_bom:
                 fd.seek(0)
